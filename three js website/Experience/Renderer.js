@@ -7,7 +7,7 @@ export default class Renderer {
         this.scene = this.experiance.scene;
         this.canvas = this.experiance.canvas;
         this.camera = this.experiance.camera;
-        console.log(this.camera);
+        this.setRenderer();
     }
     setRenderer() {
         this.renderer = new THREE.WebGL1Renderer({
@@ -23,10 +23,12 @@ export default class Renderer {
         this.renderer.setSize(this.sizes.width, this.sizes.height);
         this.renderer.setPixelRatio(this.sizes.pixelRatio)
     }
+
     resize() {
         this.renderer.setSize(this.sizes.width, this.sizes.height);
         this.renderer.setPixelRatio(this.sizes.pixelRatio)
     }
+
     update() {
         this.renderer.render(this.scene, this.camera.perspectiveCamera)
     }
