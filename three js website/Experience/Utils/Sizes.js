@@ -1,6 +1,6 @@
 import EventEmitter from "events";
-export default class Sizes extends EventEmitter {
 
+export default class Sizes extends EventEmitter {
     constructor() {
         super();
         this.width = window.innerWidth

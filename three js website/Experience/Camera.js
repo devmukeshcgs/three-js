@@ -50,6 +50,7 @@ export default class Camera {
         this.conrols.enableDamping = true;
         this.conrols.enableZoom = true;
     }
+
     resize() {
         //Updating Perspective Camera on Resize
         this.perspectiveCamera.aspect = this.sizes.aspect;
@@ -62,6 +63,7 @@ export default class Camera {
             this.orthographicCamera.bottom = -this.sizes.frustrum,
             this.orthographicCamera.updateProjectionMatrix();
     }
+
     update() {
         this.conrols.update();
     }
