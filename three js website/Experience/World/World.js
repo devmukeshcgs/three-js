@@ -17,9 +17,18 @@ export default class World {
             this.room = new Room();
             console.log("Room Created");
         })
+
+        const geometry = new THREE.RingGeometry(5, 4, 32);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xffff00,
+            side: THREE.DoubleSide
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        this.scene.add(mesh);
+
     }
 
-    resize() { }
+    resize() {}
 
-    update() { }
-} 
+    update() {}
+}
