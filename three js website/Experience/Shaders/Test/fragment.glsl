@@ -1,1 +1,4 @@
-uniform mat4 projectionMatrix;
+#ifdef GL_ES
+precision mediump float;
+#endif
+

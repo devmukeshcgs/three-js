@@ -14,7 +14,7 @@ void main(){
 
     vec2 coord = gl_FragCoord.xy/u_resolution;
     vec2 translate = vec2(1.0,0.0 );
-    coord += translate*0.5;
+    coord += translate*0.0;
  
     vec3 color = vec3(1.0, 0.0, 0.0);
  
