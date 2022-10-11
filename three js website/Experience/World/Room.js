@@ -16,14 +16,14 @@ export default class Room {
     }
 
     setModel() {
-        this.scene.add(this.actualRing);
-        this.scene.add(this.actualRingTwo);
+        // this.scene.add(this.actualRing);
+        // this.scene.add(this.actualRingTwo);
         this.actualRing.scale.set(4, 4, 4);
         this.actualRing.rotation.x = Math.PI / 2;
         this.actualRingTwo.rotation.x = Math.PI / 2;
     };
 
-    resize() { }
+    resize() {}
 
-    update() { }
-} 
+    update() {}
+}
