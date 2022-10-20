@@ -1,5 +1,4 @@
-export default [
-    {
+export default [{
         name: "ringOne",
         type: "glbModel",
         path: "/models/Ring.glb",
@@ -9,9 +8,9 @@ export default [
         type: "glbModel",
         path: "/models/RingTwo.glb",
     },
-    // {
-    //     name: "video",
-    //     type: "videoTexture",
-    //     path: "",
-    // },
+    {
+        name: "pencil",
+        type: "glbModel",
+        path: "/models/pencil.glb",
+    },
 ]

@@ -33,8 +33,13 @@ void main(){
     // float strenth = mod(position.x * 10.0, 1.0);
     // strenth = step(0.8, strenth);
     // Pattern 12
-    float strenth = mod(position.x * 10.0, 1.0);
-    strenth = step(0.8, strenth);
+    // float strenth = mod(position.y * 10.0, 1.0);
+    // strenth = step(0.8, strenth);
+    // Pattern 12
+    float strenth = mod(position.y * 10.0, 1.0);
+    float strenth2 = mod(position.x * 10.0, 1.0);
+
+    strenth = step(0.8, strenth) *step(0.8, strenth2);
 
     gl_FragColor=vec4(vec3(strenth), 1.0);
     
