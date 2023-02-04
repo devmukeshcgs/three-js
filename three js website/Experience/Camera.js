@@ -20,9 +20,9 @@ export default class Camera {
             0.1,
             1000);
         this.scene.add(this.perspectiveCamera);
-        this.perspectiveCamera.position.z = 20;
+        this.perspectiveCamera.position.z = 10;
         this.perspectiveCamera.position.x = 10;
-        this.perspectiveCamera.position.y = 5;
+        this.perspectiveCamera.position.y = 10;
     };
 
     createOrthographicCamera() {
@@ -34,21 +34,42 @@ export default class Camera {
             100
         );
         this.scene.add(this.orthographicCamera);
+        // HELPER 
+        // Camera Helper
+        // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        //const CameraHelper = new THREE.CameraHelper(this.perspectiveCamera);
+        //this.scene.add(CameraHelper);
+
         //Grid Helper
         const size = 10;
         const divisions = 10;
-
         const gridHelper = new THREE.GridHelper(size, divisions);
-        this.scene.add(gridHelper);
+        // this.scene.add(gridHelper);
         //Axes Helper
         const axesHelper = new THREE.AxesHelper(10);
         this.scene.add(axesHelper);
+        //Spot light Helper
+        const spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(2, 2, 2);
+        // this.scene.add(spotLight);
+
+        const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+        //this.scene.add(spotLightHelper);
+
+        // Directional Light Helper 
+        const light = new THREE.DirectionalLight(0x01ff91);
+        const DirectionalLightHelper = new THREE.DirectionalLightHelper(light, 5);
+        //this.scene.add(DirectionalLightHelper);
+
+
     };
 
+
+    // Orbit Controls
     setOrbitcontrols() {
         this.conrols = new OrbitControls(this.perspectiveCamera, this.canvas)
         this.conrols.enableDamping = true;
-        this.conrols.enableZoom = true;
+        this.conrols.enableZoom = false;
     }
 
     resize() {
@@ -66,5 +87,6 @@ export default class Camera {
 
     update() {
         this.conrols.update();
+
     }
 }

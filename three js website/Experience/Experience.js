@@ -24,7 +24,7 @@ export default class Experiance {
         this.renderer = new Renderer();
         this.resources = new Resources(assets);
         this.world = new World();
-
+        // this.scene.background = "0x000000"
         this.sizes.on("resize", () => {
             this.resize();
         })
@@ -41,5 +41,6 @@ export default class Experiance {
     update() {
         this.camera.update()
         this.renderer.update()
+        this.world.update()
     }
 }   
