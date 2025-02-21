@@ -1,0 +1,16 @@
+{
+    "name": "three-js-website",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --host",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "events": "^3.3.0",
+        "three": "^0.144.0",
+        "vite": "^3.1.0"
+    }
+}

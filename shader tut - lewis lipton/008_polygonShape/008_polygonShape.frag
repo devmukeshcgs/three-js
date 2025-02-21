@@ -15,12 +15,14 @@ float polygoneShape(vec2 position, float radius, float sides){
 }
 
 void main(){
+    vec2 uv = gl_FragCoord.xy/u_resolution.xy;
+    uv.x *= u_resolution.x / u_resolution.y;
 
-    vec2 position = gl_FragCoord.xy/u_resolution;
+    // vec2 position = gl_FragCoord.xy/u_resolution.xy;
  
     vec3 color = vec3(1.0, 0.0, 0.0);
 
-    float polygon = polygoneShape(position, 0.3,6.0);
+    float polygon = polygoneShape(uv, 0.1,6.0);
     
     color = vec3( polygon);
  

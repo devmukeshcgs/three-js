@@ -10,11 +10,14 @@ float circleShape(vec2 position, float radius ){
 
 void main(){
 
+vec2 uv = gl_FragCoord.xy/u_resolution.xy;
+    uv.x *= u_resolution.x / u_resolution.y;
+
     vec2 position = gl_FragCoord.xy/u_resolution;
  
     vec3 color = vec3(1.0, 1.0, 1.0);
  
-    float circle = circleShape(position, 0.2);
+    float circle = circleShape(uv, 0.2);
  
     color = vec3(circle );
  

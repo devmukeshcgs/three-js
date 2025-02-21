@@ -13,6 +13,6 @@ attribute vec2 uv;
 const float PI = 3.1415926535;
 
 void main(){
-    // gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 
 }

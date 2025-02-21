@@ -41,6 +41,6 @@ export default class Experiance {
     update() {
         this.camera.update()
         this.renderer.update()
-        // this.world.update()
+        this.world.update()
     }
 }   
