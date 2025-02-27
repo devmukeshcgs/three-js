@@ -28,7 +28,7 @@ export default class World {
         // this.scene.add(cameraPivot)
 
         const geometry = new THREE.PlaneGeometry(10, 10);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide, wireframe: true });
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide, wireframe: false });
         const plane = new THREE.Mesh(geometry, material);
         this.scene.add(plane);
         // console.log("PLANE", plane);
