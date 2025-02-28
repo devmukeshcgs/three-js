@@ -35,7 +35,20 @@ class ShaderRenderer {
 
   initGeometry() {
     // Geometry
-    this.geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
+    // this.geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
+    this.geometry = new THREE.BufferGeometry();
+
+    let count = 1000;
+    let positions = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = Math.random() - .5;
+      positions[i * 3 + 1] = Math.random() - .5;
+      positions[i * 3 + 2] = 0;
+    }
+
+    let positionAttribute = new THREE.BufferAttribute(positions, 3);
+    this.geometry.setAttribute('position', positionAttribute)
 
     // Material
     this.material = new THREE.ShaderMaterial({
@@ -44,9 +57,15 @@ class ShaderRenderer {
       side: THREE.DoubleSide,
     });
 
+    // this.geometry = new THREE.PlaneGeometry
+    this.geometry = new THREE.PlaneGeometry(1, 1, 20, 20);
+
+    this.plane = new THREE.Points(this.geometry, this.material);
+    this.scene.add(this.plane);
+    
     // Mesh
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.scene.add(this.mesh);
+    // this.mesh = new THREE.Mesh(this.geometry, this.material);
+    // this.scene.add(this.mesh);
   }
 
   initCamera() {
