@@ -18,7 +18,7 @@ void main() {
 //   v_TexCoord = aTexCoord;
   v_TexCoord = aPosition.xy;
   gl_PointSize = u_PointSize;
-//   vec4 position = vec4(aPosition, 1.0);
+    // vec4 position = vec4(aPosition, 1.0);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 
   // position.xy = position.xy * 2. - 1.;

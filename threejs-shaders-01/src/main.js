@@ -68,7 +68,7 @@ class ShaderRenderer {
     // this.geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
     this.geometry = new THREE.BufferGeometry();
 
-    let count = 10000;
+    let count = 5000;
     let positions = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
@@ -86,25 +86,33 @@ class ShaderRenderer {
       fragmentShader: fragmentShader,
       side: THREE.DoubleSide,
       transparent: true,
+      depthTest: false,
+      depthWrite: false,
       uniforms: {
         u_time: { value: 0 },
         u_resolution: { value: new THREE.Vector2(1, 1) },
         u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
         u_Texture: { value: new THREE.TextureLoader().load("https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png") },
-        u_PointSize: { value: 1 },
-        U_Rows: { value: 100 },
-        U_Cols: { value: 100 }
+        u_PointSize: { value: 2 },
+        U_Rows: { value: 1000 },
+        U_Cols: { value: 1000 }
       },
     });
 
-    // this.geometry = new THREE.PlaneGeometry(1, 1, 20, 20);
 
-    this.plane = new THREE.Points(this.geometry, this.material);
-    this.scene.add(this.plane);
+    this.mesh = new THREE.Points(this.geometry, this.material);
+    this.scene.add(this.mesh);
 
     // Mesh
     // this.mesh = new THREE.Mesh(this.geometry, this.material);
     // this.scene.add(this.mesh);
+
+    const geometry = new THREE.PlaneGeometry(0.5, 0.5);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+    const plane = new THREE.Mesh(geometry, this.material);
+    this.scene.add(plane);
+
+
   }
 
   initCamera() {

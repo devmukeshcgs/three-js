@@ -17,6 +17,15 @@ varying vec2 v_TexCoord;
 varying vec2 vUv;
 
 void main() {
+    vec2 uv = gl_PointCoord;
+    uv.y =1.;
+    uv /= vec2(u_Cols, u_Rows);
+    float texOffsetU = v_TexCoord.x / u_Cols;
+    float texOffsetV = v_TexCoord.y / u_Rows;
+    uv += vec2 (texOffsetU, texOffsetV);
+    uv =+ vec2(0.5, 0.5);
+    vec4 texture = texture2D(u_Texture, uv);
+    gl_FragColor = texture;
   if (u_UseTexture) {
   // vec2 pos = v_TexCoord;
     // vec4 texColor = texture2D(u_Texture, pos);
@@ -50,20 +59,12 @@ void main() {
     // gl_FragColor = vec4(sinColor, 0., 1., 1.);
 
   }
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-   uv.y *= -1.;
-   uv /= vec2 (u_Rows, u_Cols);
-   float texOffsetU = v_TexCoord.x / u_Rows;
-   float texOffsetV = v_TexCoord.y / u_Cols;
-     uv += vec2(texOffsetU, texOffsetV);
-    uv += vec2 (0.5, 0.5);
-    vec4 texColor = texture2D(u_Texture, uv);
-    // uv += vec2 (0.5, 0.5);
-    // uv.y += u_time;
-    // vec4 texColor = texture2D(u_Texture, uv);
-    gl_FragColor = vec4(texColor);
-
-    gl_FragColor = vec4(0.76, 0.0, 0.0, 1.0);
+    // vec2 pos = v_TexCoord;
+    // vec4 texColor = texture2D(u_Texture, pos);
+    // gl_FragColor = vec4(texColor);
+    // gl_FragColor = vec4(0.76, 0.0, 0.0, 1.0);
     // gl_FragColor = texture2D(u_Texture, v_TexCoord);
+    if(gl_FragColor.r < 0.1) discard;
+    // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 
 }
