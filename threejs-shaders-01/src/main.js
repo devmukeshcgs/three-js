@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import gsap from "gsap";
+import Stats from 'stats.js'
+
 import vertexShader from "./shaders/vertex.glsl";
 import fragmentShader from "./shaders/fragment.glsl";
 import "./style.css";
@@ -12,6 +14,8 @@ class ShaderRenderer {
   constructor() {
     // Debug
     this.gui = new GUI();
+    //FPS, MS, MB, CUSTOM
+    this.stats = new Stats()
 
     // Canvas
     this.canvas = document.querySelector("canvas.webgl");
@@ -24,7 +28,9 @@ class ShaderRenderer {
       width: window.innerWidth,
       height: window.innerHeight,
     };
+    this.loader = new THREE.TextureLoader();
 
+    this.initStats();
     this.initGeometry();
     this.initCamera();
     this.initRenderer();
@@ -33,12 +39,36 @@ class ShaderRenderer {
     this.startAnimationLoop();
   }
 
+  loadTexture(name, material) {
+    const load = () => this.loader.load(
+      "https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png",
+      (texture) => {
+        material.matcap = texture
+        material.needsUpdate = true
+      },
+      undefined,
+      load
+    )
+    load()
+  }
+
+  initStats() {
+    // the number will decide which information will be displayed
+    // 0 => FPS Frames rendered in the last second. The higher the number the better.
+    // 1 => MS Milliseconds needed to render a frame. The lower the number the better.
+    // 2 => MB MBytes of allocated memory. (Run Chrome with --enable-precise-memory-info)
+    // 3 => CUSTOM User-defined panel support.
+    this.stats.showPanel(0)
+
+    document.body.appendChild(this.stats.dom)
+  }
+
   initGeometry() {
     // Geometry
     // this.geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
     this.geometry = new THREE.BufferGeometry();
 
-    let count = 1000;
+    let count = 10000;
     let positions = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
@@ -55,27 +85,49 @@ class ShaderRenderer {
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
       side: THREE.DoubleSide,
+      transparent: true,
+      uniforms: {
+        u_time: { value: 0 },
+        u_resolution: { value: new THREE.Vector2(1, 1) },
+        u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
+        u_Texture: { value: new THREE.TextureLoader().load("https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png") },
+        u_PointSize: { value: 1 },
+        U_Rows: { value: 100 },
+        U_Cols: { value: 100 }
+      },
     });
 
-    // this.geometry = new THREE.PlaneGeometry
-    this.geometry = new THREE.PlaneGeometry(1, 1, 20, 20);
+    // this.geometry = new THREE.PlaneGeometry(1, 1, 20, 20);
 
     this.plane = new THREE.Points(this.geometry, this.material);
     this.scene.add(this.plane);
-    
+
     // Mesh
     // this.mesh = new THREE.Mesh(this.geometry, this.material);
     // this.scene.add(this.mesh);
   }
 
   initCamera() {
+    const fielsOfView = 75;
+    const aspectRatio = this.sizes.width / this.sizes.height;
+    const near = 0.1;
+    const far = 10000;
+
     // Base camera
+
     this.camera = new THREE.PerspectiveCamera(
-      75,
-      this.sizes.width / this.sizes.height,
-      0.1,
-      100
+      fielsOfView,
+      aspectRatio,
+      near,
+      far,
     );
+    // this.camera = new THREE.PerspectiveCamera(
+    //   75,
+    //   this.sizes.width / this.sizes.height,
+    //   0.1,
+    //   100
+    // );
+    // this.camera.lookAt(0,0,0);
     this.camera.position.set(0.25, -0.25, 1);
     this.scene.add(this.camera);
   }
@@ -112,12 +164,13 @@ class ShaderRenderer {
   }
 
   animate() {
+    this.stats.begin();
     // Update controls
     this.controls.update();
 
     // Render
     this.renderer.render(this.scene, this.camera);
-
+    this.stats.end();
     // Call animate again on the next frame
     window.requestAnimationFrame(() => this.animate());
   }
