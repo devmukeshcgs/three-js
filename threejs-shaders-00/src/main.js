@@ -4,12 +4,8 @@ import GUI from "lil-gui";
 import gsap from "gsap";
 import Stats from 'stats.js'
 
-import perspectiveVertShader from "./shaders/perspective.vert";
-import perspectiveFragShader from "./shaders/perspective.frag";
 import vertexShader from "./shaders/vertex.glsl";
 import fragmentShader from "./shaders/fragment.glsl";
-import grainVert from "./shaders/grain.vert";
-import grainFrag from "./shaders/grain.frag";
 import "./style.css";
 
 console.log(gsap);
@@ -71,10 +67,8 @@ class ShaderRenderer {
     // Geometry
     // this.geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
     this.geometry = new THREE.BufferGeometry();
-    const grainGeometry = new THREE.PlaneGeometry(0.5, 0.5);
 
-
-    let count = 500;
+    let count = 5000;
     let positions = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
@@ -84,16 +78,8 @@ class ShaderRenderer {
     }
 
     let positionAttribute = new THREE.BufferAttribute(positions, 3);
-    this.geometry.setAttribute('position', positionAttribute);
-    let uniforms = {
-      u_time: { value: 0 },
-      u_resolution: { value: new THREE.Vector2(1, 1) },
-      u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
-      u_Texture: { value: new THREE.TextureLoader().load("https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png") },
-      u_PointSize: { value: 2 },
-      U_Rows: { value: 1000 },
-      U_Cols: { value: 1000 }
-    };
+    this.geometry.setAttribute('position', positionAttribute)
+
     // Material
     this.material = new THREE.ShaderMaterial({
       vertexShader: vertexShader,
@@ -102,33 +88,29 @@ class ShaderRenderer {
       transparent: true,
       depthTest: false,
       depthWrite: false,
-      uniforms: uniforms,
+      uniforms: {
+        u_time: { value: 0 },
+        u_resolution: { value: new THREE.Vector2(1, 1) },
+        u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
+        u_Texture: { value: new THREE.TextureLoader().load("https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png") },
+        u_PointSize: { value: 2 },
+        U_Rows: { value: 1000 },
+        U_Cols: { value: 1000 }
+      },
     });
+
+
     this.mesh = new THREE.Points(this.geometry, this.material);
     this.scene.add(this.mesh);
 
-    // GRAIN 
-    // Grain Material / perspectiveFragShader
-    this.grainMaterial = new THREE.ShaderMaterial({
-      vertexShader: grainVert,
-      fragmentShader: grainFrag,
-      side: THREE.DoubleSide,
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
-      uniforms: uniforms,
-    });
-    const plane = new THREE.Mesh(grainGeometry, this.grainMaterial);
-    this.scene.add(plane);
-
-
-    // MESH
+    // Mesh
     // this.mesh = new THREE.Mesh(this.geometry, this.material);
     // this.scene.add(this.mesh);
-    // const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
 
-    // this.grainGeometry.setAttribute('grain_position', positionAttribute);
-
+    const geometry = new THREE.PlaneGeometry(0.5, 0.5);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+    const plane = new THREE.Mesh(geometry, this.material);
+    this.scene.add(plane);
 
 
   }
