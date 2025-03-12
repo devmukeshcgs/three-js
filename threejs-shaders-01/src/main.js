@@ -76,7 +76,6 @@ class ShaderRenderer {
 
     let count = 500;
     let positions = new Float32Array(count * 3);
-
     for (let i = 0; i < count; i++) {
       positions[i * 3] = Math.random() - .5;
       positions[i * 3 + 1] = Math.random() - .5;
@@ -85,6 +84,9 @@ class ShaderRenderer {
 
     let positionAttribute = new THREE.BufferAttribute(positions, 3);
     this.geometry.setAttribute('position', positionAttribute);
+
+
+    // UNIFORMS
     let uniforms = {
       u_time: { value: 0 },
       u_resolution: { value: new THREE.Vector2(1, 1) },
@@ -108,19 +110,18 @@ class ShaderRenderer {
     this.scene.add(this.mesh);
 
     // GRAIN 
-    // Grain Material / perspectiveFragShader
+      // Grain Material / perspectiveFragShader
     this.grainMaterial = new THREE.ShaderMaterial({
       vertexShader: grainVert,
       fragmentShader: grainFrag,
       side: THREE.DoubleSide,
-      transparent: true,
+      transparent: false,
       depthTest: false,
       depthWrite: false,
       uniforms: uniforms,
     });
     const plane = new THREE.Mesh(grainGeometry, this.grainMaterial);
     this.scene.add(plane);
-
 
     // MESH
     // this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -129,7 +130,34 @@ class ShaderRenderer {
 
     // this.grainGeometry.setAttribute('grain_position', positionAttribute);
 
+    // Create the plane geometry and hollow circle
+    const planeWidth = 2;
+    const planeHeight = 2;
+    const holeRadius = 0.5;
 
+    // Define the outer shape (plane rectangle)
+    const outerShape = new THREE.Shape();
+    outerShape.moveTo(-planeWidth / 2, -planeHeight / 2);
+    outerShape.lineTo(planeWidth / 2, -planeHeight / 2);
+    outerShape.lineTo(planeWidth / 2, planeHeight / 2);
+    outerShape.lineTo(-planeWidth / 2, planeHeight / 2);
+    outerShape.lineTo(-planeWidth / 2, -planeHeight / 2);
+
+    // Define the circular hole
+    const holePath = new THREE.Path();
+    holePath.absarc(0, 0, holeRadius, 0, Math.PI * 2, false);
+
+    // Subtract the hole from the plane
+    outerShape.holes.push(holePath);
+    // Create the geometry from the shape
+    const geometry2 = new THREE.ShapeGeometry(outerShape);
+
+    // Create a material
+    const material2 = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+
+    // Create the mesh
+    const plane2 = new THREE.Mesh(geometry2, this.grainMaterial);
+    this.scene.add(plane2);
 
   }
 
@@ -154,7 +182,9 @@ class ShaderRenderer {
     //   100
     // );
     // this.camera.lookAt(0,0,0);
-    this.camera.position.set(0.25, -0.25, 1);
+    // this.camera.position.set(0.25, -0.25, 1);
+    this.camera.position.z = 2;
+
     this.scene.add(this.camera);
   }
 
