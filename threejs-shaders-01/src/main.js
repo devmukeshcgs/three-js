@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+
 import GUI from "lil-gui";
 import gsap from "gsap";
 import Stats from 'stats.js'
@@ -94,7 +98,10 @@ class ShaderRenderer {
       u_Texture: { value: new THREE.TextureLoader().load("https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png") },
       u_PointSize: { value: 2 },
       U_Rows: { value: 1000 },
-      U_Cols: { value: 1000 }
+      U_Cols: { value: 1000 },
+      lightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+      lightColor: { value: new THREE.Color(0xffffff) },
+      ambientColor: { value: new THREE.Color(0x333333) }
     };
     // Material
     this.material = new THREE.ShaderMaterial({
@@ -110,7 +117,7 @@ class ShaderRenderer {
     this.scene.add(this.mesh);
 
     // GRAIN 
-      // Grain Material / perspectiveFragShader
+    // Grain Material / perspectiveFragShader
     this.grainMaterial = new THREE.ShaderMaterial({
       vertexShader: grainVert,
       fragmentShader: grainFrag,
@@ -158,6 +165,124 @@ class ShaderRenderer {
     // Create the mesh
     const plane2 = new THREE.Mesh(geometry2, this.grainMaterial);
     this.scene.add(plane2);
+
+    //////////////////////////////////
+
+    // Define the shader material
+
+    const shaderMaterial = new THREE.ShaderMaterial({
+      vertexShader: `
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+
+      void main() {
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          vNormal = normalize(normalMatrix * normal);
+          vPosition = vec3(modelViewMatrix * vec4(position, 1.0));
+      }
+  `,
+      fragmentShader: `
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+
+      uniform vec3 lightDirection;
+      uniform vec3 lightColor;
+      uniform vec3 ambientColor;
+
+      void main() {
+          vec3 lightDir = normalize(lightDirection);
+          float diffuse = max(dot(vNormal, lightDir), 0.0);
+          vec3 color = ambientColor + lightColor * diffuse;
+          gl_FragColor = vec4(color, 1.0);
+      }
+  `,
+      uniforms: {
+        lightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+        lightColor: { value: new THREE.Color(0xffffff) },
+        ambientColor: { value: new THREE.Color(0x333333) }
+      }
+    });
+
+    // Create a sphere and apply the shader material
+    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const sphere = new THREE.Mesh(sphereGeometry, shaderMaterial);
+    // sphere.position.set(-2, 0, 0); // Move sphere to the left
+    this.scene.add(sphere);
+
+    // Create a plane and apply the shader material
+    const planeGeometry = new THREE.PlaneGeometry(1, 1);
+    const plane22 = new THREE.Mesh(planeGeometry, shaderMaterial);
+    plane22.position.set(0.5, 0, 1.5); // Move plane to the right
+    // plane22.rotation.x = -Math.PI / 2; // Rotate the plane to face the camera
+    this.scene.add(plane22);
+
+    // Add ambient light to the scene (optional)
+    const ambientLight = new THREE.AmbientLight(0x404040); // Soft white light
+    this.scene.add(ambientLight);
+
+    // Add directional light to the scene (optional)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(1, 1, 1).normalize();
+    this.scene.add(directionalLight);
+    // ====================================================\
+    // Frosted glass shader
+const FrostedGlassShader = {
+  uniforms: {
+      tDiffuse: { value: null }, // Input texture
+      resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      opacity: { value: 0.5 }, // Glass opacity
+      blurRadius: { value: 4.0 } // Blur radius
+  },
+  vertexShader: `
+      varying vec2 vUv;
+
+      void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+  `,
+  fragmentShader: `
+      varying vec2 vUv;
+
+      uniform sampler2D tDiffuse;
+      uniform vec2 resolution;
+      uniform float opacity;
+      uniform float blurRadius;
+
+      void main() {
+          vec2 texelSize = 1.0 / resolution;
+          vec4 color = vec4(0.0);
+          float totalWeight = 0.0;
+
+          for (int x = -2; x <= 2; ++x) {
+              for (int y = -2; y <= 2; ++y) {
+                  vec2 offset = vec2(float(x), float(y)) * texelSize * blurRadius;
+                  float weight = 1.0 - length(offset) / (5.0 * blurRadius);
+                  color += texture2D(tDiffuse, vUv + offset) * weight;
+                  totalWeight += weight;
+              }
+          }
+          color /= totalWeight;
+          color.a = opacity;
+          gl_FragColor = color;
+      }
+  `
+};
+// Create a simple mesh for demonstration
+const geometry = new THREE.BoxGeometry();
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+this.scene.add(cube);
+
+// Postprocessing
+const composer = new EffectComposer(this.renderer);
+const renderPass = new RenderPass(scene, camera);
+this.composer.addPass(renderPass);
+
+// Add frosted glass effect
+const frostedGlassPass = new ShaderPass(FrostedGlassShader);
+this.composer.addPass(frostedGlassPass);
+
 
   }
 
