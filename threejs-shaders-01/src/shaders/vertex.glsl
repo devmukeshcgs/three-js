@@ -11,13 +11,13 @@ attribute vec2 aTexCoord; //holds coordinates of texture
 //this will pass to fragment shader
 varying vec2 vUv;
 varying vec2 v_TexCoord;
-uniform float u_PointSize;
+uniform float u_pointSize;
 
 void main() {
   vUv = aTexCoord;
 //   v_TexCoord = aTexCoord;
   v_TexCoord = aPosition.xy;
-  gl_PointSize = u_PointSize;
+  gl_PointSize = u_pointSize;
     // vec4 position = vec4(aPosition, 1.0);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 
