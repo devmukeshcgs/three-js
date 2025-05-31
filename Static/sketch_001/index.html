@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible"
+        content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+    <title>Sketch 001</title>
+
+    <link rel="stylesheet"
+        href="../css/reset.css">
+    <link rel="stylesheet"
+        href="../css/style.css">
+
+    <!-- JS FILES -->
+
+</head>
+
+<body>
+    <h3 class="sketch-name"> Sketch 001 </h3>
+
+    <h3 class="back-btn"> <a href="../index.html">Back</a> </h3>
+    <div id="myCanvas"></div>
+
+    <!-- SCRIPTS -->
+
+    <script type="module"
+        src="./script.js"></script>
+
+    <!-- VERTIX SHADER -->
+
+    <script type="x-shader/x-vertex"
+        id="vertexShader">
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+        attribute vec3 position;
+        attribute vec2 uv;
+        attribute vec3 randPos;
+        uniform float u_time;
+        varying vec2 vUv;
+
+        void main(){
+            vUv=uv;
+            vec4 mvPosition=modelViewMatrix*vec4(position,1.);
+            gl_PointSize=10.*(1./-mvPosition.z);
+            gl_Position=projectionMatrix*mvPosition;
+        }
+    </script>
+    <!-- FRAGMENT SHADER -->
+    <script type="x-shader/x-fragment"
+        id="fragmentShader">
+        precision mediump float;
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        uniform sampler2D texture;
+        varying vec2 vUv;
+        void main() {
+                vec2 st = gl_FragCoord.xy/u_resolution.xy;
+                gl_FragColor = texture2D(texture, vUv);
+        }
+</script>
+</body>
+
+</html>
