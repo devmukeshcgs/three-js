@@ -8,8 +8,8 @@ uniform float u_time;       // Time in seconds since load
 uniform float millis;       // Time in seconds since load
 uniform sampler2D u_Texture;  // Image as texture
 uniform bool u_UseTexture;   // Whether to use the texture
-uniform float u_Rows;
-uniform float u_Cols;
+uniform float u_rows;
+uniform float u_cols;
 // get this from vertex file
 varying vec2 pos;
 varying vec2 v_TexCoord;
@@ -19,9 +19,9 @@ varying vec2 vUv;
 void main() {
     vec2 uv = gl_PointCoord;
     uv.y =1.;
-    uv /= vec2(u_Cols, u_Rows);
-    float texOffsetU = v_TexCoord.x / u_Cols;
-    float texOffsetV = v_TexCoord.y / u_Rows;
+    uv /= vec2(u_cols, u_rows);
+    float texOffsetU = v_TexCoord.x / u_cols;
+    float texOffsetV = v_TexCoord.y / u_rows;
     uv += vec2 (texOffsetU, texOffsetV);
     uv =+ vec2(0.5, 0.5);
     vec4 texture = texture2D(u_Texture, uv);

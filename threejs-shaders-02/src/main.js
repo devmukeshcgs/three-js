@@ -1,19 +1,31 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+
 import GUI from "lil-gui";
-import gsap from "gsap";
+import { Pane } from 'tweakpane';
 import Stats from 'stats.js'
 
-import vertexShader from "./shaders/vertex.glsl";
-import fragmentShader from "./shaders/fragment.glsl";
+import gsap from "gsap";
 import "./style.css";
 
-console.log(gsap);
+// Shaders
+
+import speherVertexShader from "./shaders/speher/vertex.glsl";
+import speherFragmentShader from "./shaders/speher/fragment.glsl";
+// hollo plane shaders
+import planVertexShader from "./shaders/plane/vertex.glsl";
+import planFragmentShader from "./shaders/plane/fragment.glsl";
+
 
 class ShaderRenderer {
   constructor() {
     // Debug
     this.gui = new GUI();
+    this.pane = new Pane();
+
     //FPS, MS, MB, CUSTOM
     this.stats = new Stats()
 
@@ -59,67 +71,67 @@ class ShaderRenderer {
     // 2 => MB MBytes of allocated memory. (Run Chrome with --enable-precise-memory-info)
     // 3 => CUSTOM User-defined panel support.
     this.stats.showPanel(0)
-
     document.body.appendChild(this.stats.dom)
   }
 
   initGeometry() {
     // Geometry
-    // this.geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
-    this.geometry = new THREE.BufferGeometry();
+    this.geometry = new THREE.PlaneGeometry(1, 1,);
 
-    let count = 5000;
-    let positions = new Float32Array(count * 3);
+    // UNIFORMS
+    let uniforms = {
+      u_time: { value: 0 },
+      u_radius: { value: 0.5 },
+      u_resolution: { value: new THREE.Vector2(1, 1) },
+      u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
+      u_Texture: { value: new THREE.TextureLoader().load("https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png") },
+      u_PointSize: { value: 2 },
+      u_rows: { value: 1000 },
+      u_cols: { value: 1000 },
+      u_lightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+      u_lightColor: { value: new THREE.Color(0xffffff) },
+      u_ambientColor: { value: new THREE.Color(0x333333) }
+    };
 
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = Math.random() - .5;
-      positions[i * 3 + 1] = Math.random() - .5;
-      positions[i * 3 + 2] = 0;
-    }
-
-    let positionAttribute = new THREE.BufferAttribute(positions, 3);
-    this.geometry.setAttribute('position', positionAttribute)
-
-    // Material
-    this.material = new THREE.ShaderMaterial({
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
+    ////////////////////////////////////////////////////////////////////
+    // Create a material
+    this.planeMat = new THREE.ShaderMaterial({
+      vertexShader: planVertexShader,
+      fragmentShader: planFragmentShader,
       side: THREE.DoubleSide,
       transparent: true,
       depthTest: false,
       depthWrite: false,
-      uniforms: {
-        u_time: { value: 0 },
-        u_resolution: { value: new THREE.Vector2(1, 1) },
-        u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
-        u_Texture: { value: new THREE.TextureLoader().load("https://documents.iplt20.com/ipl/IPLHeadshot2024/62.png") },
-        u_pointSize: { value: 2 },
-        u_rows: { value: 1000 },
-        u_cols: { value: 1000 }
-      },
+      uniforms: uniforms,
     });
 
-
-    this.mesh = new THREE.Points(this.geometry, this.material);
-    this.scene.add(this.mesh);
-
-    // Mesh
-    // this.mesh = new THREE.Mesh(this.geometry, this.material);
-    // this.scene.add(this.mesh);
-
-    const geometry = new THREE.PlaneGeometry(0.5, 0.5);
-    const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
-    const plane = new THREE.Mesh(geometry, this.material);
-    this.scene.add(plane);
-
-
+    this.planeMat.uniforms.u_radius = { value: 0.5 };
+    // GUI RAIDUS
+    this.gui.add(this.planeMat.uniforms.u_radius, 'value').min(0).max(1).step(0.01).name('Radius');
+    // Create the mesh 
+    const hollowPlane = new THREE.Mesh(this.geometry, this.planeMat);
+    this.scene.add(hollowPlane);
+    ////////////////////////////////////////////////////////////////////
+    const SphereGeo = new THREE.SphereGeometry(0.25, 32, 32);
+    const SphereMat = new THREE.ShaderMaterial({
+      vertexShader: speherVertexShader,
+      fragmentShader: speherFragmentShader,
+      side: THREE.DoubleSide,
+      transparent: false,
+      depthTest: false,
+      depthWrite: false,
+      uniforms: uniforms,
+    });
+    const sphere = new THREE.Mesh(SphereGeo, SphereMat);
+    sphere.position.x = 0.5;
+    this.scene.add(sphere);
   }
 
   initCamera() {
     const fielsOfView = 75;
     const aspectRatio = this.sizes.width / this.sizes.height;
     const near = 0.1;
-    const far = 10000;
+    const far = 1000;
 
     // Base camera
 
@@ -129,14 +141,8 @@ class ShaderRenderer {
       near,
       far,
     );
-    // this.camera = new THREE.PerspectiveCamera(
-    //   75,
-    //   this.sizes.width / this.sizes.height,
-    //   0.1,
-    //   100
-    // );
-    // this.camera.lookAt(0,0,0);
-    this.camera.position.set(0.25, -0.25, 1);
+    this.camera.position.z = 1;
+
     this.scene.add(this.camera);
   }
 
@@ -146,6 +152,7 @@ class ShaderRenderer {
     });
     this.renderer.setSize(this.sizes.width, this.sizes.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setClearColor(0x202020, 1);
   }
 
   initControls() {
