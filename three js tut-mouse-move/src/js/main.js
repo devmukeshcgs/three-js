@@ -10,6 +10,8 @@ function lerp(start, end, t) {
 
 let targetX = 0;
 let targetY = 0;
+let meshWidth = 250;
+let meshHeight = 350;
 
 const textureOne = new THREE.TextureLoader().load(images.imageOne);
 const textureTwo = new THREE.TextureLoader().load(images.imageTwo);
@@ -20,22 +22,24 @@ const textureFour = new THREE.TextureLoader().load(images.imageFour);
 class WebGL {
   constructor() {
     this.container = document.querySelector('main');
-    this.links = [...document.querySelectorAll('li')];
-    this.scene = new THREE.Scene();
+    this.links = [...document.querySelectorAll('li.proj')];
+    console.log();
+    
+    this.isMoving = true;
     this.perspective = 1000;
+    this.scene = new THREE.Scene();
     this.sizes = new THREE.Vector2(0, 0);
     this.offset = new THREE.Vector2(0, 0); // Positions of mesh on screen. Will be updated below.
     this.uniforms = {
+      uIsMoving: { value: this.isMoving },
       uTexture: { value: new THREE.TextureLoader().load(images.imageThree) },
       uAlpha: { value: 0.0 },
       uOffset: { value: new THREE.Vector2(0.0, 0.0) }
     }
     this.links.forEach((link, idx) => {
       link.addEventListener('mouseenter', () => {
-
         switch (idx) {
           case 0:
-
             this.uniforms.uTexture.value = textureOne;
             break;
           case 1:
@@ -50,11 +54,24 @@ class WebGL {
         }
       })
 
+      //When link clicked, set mesh width and height to viewport width and height
+      link.addEventListener('click', () => {
+        this.isMoving = false;
+        console.log('clicked', this.isMoving);
+
+        meshWidth = this.viewport.width;
+        meshHeight = this.viewport.height;
+        this.sizes.set(meshWidth, meshHeight, 1);
+        this.mesh.scale.set(this.sizes.x, this.sizes.y, 1);
+        targetX = this.viewport.width / 2;
+        targetY = this.viewport.height / 2;
+      });
+
       link.addEventListener('mouseleave', () => {
         this.uniforms.uAlpha.value = lerp(this.uniforms.uAlpha.value, 0.0, 0.1);
       });
     })
-    this.addEventListeners(document.querySelector('ul'));
+    this.addEventListeners(document.querySelector('ul.projects'));
     this.setUpCamera();
     this.onMouseMove();
     this.createMesh();
@@ -107,10 +124,10 @@ class WebGL {
       // side: THREE.DoubleSide
     })
     this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.sizes.set(250, 350, 1);
+    this.sizes.set(meshWidth, meshHeight, 1);
     this.mesh.scale.set(this.sizes.x, this.sizes.y, 1);
 
-    this.mesh.position.set(this.offset.x, this.offset.y, 0);
+    // this.mesh.position.set(this.offset.x, this.offset.y, 0);
 
     this.scene.add(this.mesh);
   }
@@ -123,10 +140,12 @@ class WebGL {
   }
 
   onMouseMove() {
+    console.log('onMouseMove', this.isMoving);
     window.addEventListener('mousemove', (e) => {
-      targetX = e.clientX;
-      targetY = e.clientY;
+      targetX = this.isMoving ? e.clientX : this.viewport.width / 2;
+      targetY = this.isMoving ? e.clientY : this.viewport.height / 2;
     })
+
   }
 
   render() {

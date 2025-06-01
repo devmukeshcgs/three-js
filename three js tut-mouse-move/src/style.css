@@ -8,7 +8,6 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Ogg";
-  font-size: 1.5rem;
   color: #131313;
 }
 
@@ -17,24 +16,100 @@ body {
   background-color: #dadada;
 }
 
+ul {
+  padding: 0px;
+  margin: 0px;
+}
+
+li {
+  list-style: none;
+}
+
 canvas {
   position: absolute;
   z-index: -2;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #ccc;
+  align-content: center;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+nav {}
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+}
+
+nav ul li {
+  list-style: none;
+}
+
+nav ul li a {
+  padding: 0.5rem 0.75rem;
+  /* display: block; */
+  color: #131313;
+  text-decoration: none;
+  font-size: medium;
+}
+
+a {
+  display: block;
+  color: #131313;
+  text-decoration: none;
+  font-size: medium;
 }
 
 main {
   position: fixed;
+  /* position: relative; */
+  /* position: absolute; */
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
+  /* display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: center;
+  align-items: center; */
 }
 
-ul {
-  position: absolute;
+section {
+  min-height: 100vh;
+}
+
+#sec-1 {
+  background-color: red;
+}
+
+#projects {
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+ul.projects {
+  /* margin-top: 20%; */
+  /* position: absolute;
   left: 10%;
-  top: 20%;
-  height: 60%;
+  height: 60%;*/
   width: 80%;
   list-style: none;
   display: flex;
@@ -42,13 +117,15 @@ ul {
   justify-content: space-between;
 }
 
-ul li {
+ul.projects li {
   position: relative;
   border-bottom: 1px solid rgba(0, 0, 0, 0.118);
   cursor: pointer;
   transition: 1s;
+  font-size: 1.5rem;
+  padding: 1rem;
 }
 
-ul li:hover {
+ul.projects li:hover {
   opacity: 1 !important;
 }
