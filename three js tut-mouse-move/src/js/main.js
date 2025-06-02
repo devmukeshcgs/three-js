@@ -4,6 +4,71 @@ import vertexShader from '../shaders/vertex.glsl?raw';
 import fragmentShader from '../shaders/fragment.glsl?raw';
 import '../style.css';
 
+const main = document.querySelector('main');
+const navLinks = [...document.querySelectorAll('li.nav-link')]
+// const navLinks = [...document.getElementsByClassName('nav-link')]
+const transitionDiv = document.querySelector('.transition__div')
+
+navLinks.forEach(link => {
+  link.addEventListener('click', async e => {
+    e.preventDefault();
+    const url = e.target.href
+    startTransition(url);
+    const pathname = new URL(url);
+    history.pushState(null, '', pathname)
+  })
+})
+
+// handle back button click
+window.addEventListener('popstate', () => {
+  const url = window.location.pathname;
+  startTransition(url);
+})
+
+const startTransition = async (url) => {
+  const html = await fetch(url);
+  const htmlString = await html.text();
+  const parser = new DOMParser();
+  const parserhtml = parser.parseFromString(htmlString, 'text/html').querySelector('main')
+
+  // FADEIN / FADEOUT
+
+  // main.classList.add('hidden');
+  // main.addEventListener('transitionend', () => {
+  //   console.log("Ended.");
+  //   main.innerHTML = parserhtml.innerHTML;
+  //   main.classList.remove('hidden');
+  // }, { once: true })
+
+  // SLIDE EFFECT
+
+  transitionDiv.classList.add('animate__in');
+  transitionDiv.addEventListener('transitionend', () => {
+    main.innerHTML = parserhtml.innerHTML;
+    transitionDiv.classList.remove('animate__in');
+    transitionDiv.classList.add('animate__out');
+
+    setTimeout(() => {
+      transitionDiv.style.transition = '0s';
+      transitionDiv.classList.remove('animate__out');
+
+      setTimeout(() => {
+        transitionDiv.style.transition = '1s';
+      }, 100)
+
+    }, 1000)
+  })
+}
+
+function bindEvents() {
+  // Remove old event listeners first if needed
+  const buttons = document.querySelectorAll('.my-button');
+  buttons.forEach(btn => {
+    btn.removeEventListener('click', handler);
+    btn.addEventListener('click', handler);
+  });
+}
+
 function lerp(start, end, t) {
   return start * (1 - t) + end * t;
 }
@@ -18,13 +83,12 @@ const textureTwo = new THREE.TextureLoader().load(images.imageTwo);
 const textureThree = new THREE.TextureLoader().load(images.imageThree);
 const textureFour = new THREE.TextureLoader().load(images.imageFour);
 
-
 class WebGL {
   constructor() {
     this.container = document.querySelector('main');
     this.links = [...document.querySelectorAll('li.proj')];
     console.log();
-    
+
     this.isMoving = true;
     this.perspective = 1000;
     this.scene = new THREE.Scene();
